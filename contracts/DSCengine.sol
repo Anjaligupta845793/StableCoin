@@ -30,32 +30,33 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
 contract DSCEngine {
-      //////////////////////////////
-              //ERROR 
-       //////////////////////////////
+      /////////////////////////////////////////
+                   //ERROR 
+       ////////////////////////////////////////
 
        error DSCEngine_NotZeroAmount();
        error DSCEngine_NotValidTokenPriceFeedAddress();
        error DSCEngine_NotAllowedAddress();
        error DSCEngine__TransferFailed();
-       //////////////////////////////
-              //State Variables
-       //////////////////////////////
+       /////////////////////////////////////////
+                //State Variables
+       /////////////////////////////////////////
 
        mapping(address token => address pricefeed) private s_allowedAddress;
        mapping(address user => mapping(address token => uint amount)) private s_colletralAmount;
+       mapping(address user => uint colletralAmount) private s_mintedColletralAmount;
        address[] private s_tokenAddress;
        address[] private s_priceFeedAddress;
        StableCoin private immutable d_sc;
 
-       //////////////////////////////
-              //EVENTS
-       //////////////////////////////
+       ///////////////////////////////////////////
+                    //EVENTS
+       ///////////////////////////////////////////
        event ColletralDeposited(address user, address tokenaddress , uint tokenAmount);
 
-       //////////////////////////////
-              //MODIFIER
-       //////////////////////////////
+       ///////////////////////////////////////////
+                    //MODIFIER
+       ///////////////////////////////////////////
        modifier isAllowedToken(address token){
              if(token == address(0)){
                 revert DSCEngine_NotAllowedAddress(); 
@@ -63,9 +64,9 @@ contract DSCEngine {
              _;
        }
 
-       //////////////////////////////
-              //FUNCTION
-       //////////////////////////////
+       ////////////////////////////////////////////
+                // EXTERNAL FUNCTION
+       ////////////////////////////////////////////
        
        constructor(address[] memory _tokenAddress , address[] memory _pricefeed , address d_scAddress){
         if(_tokenAddress.length != _pricefeed.length){
@@ -91,6 +92,26 @@ contract DSCEngine {
           if(!success){
             revert DSCEngine__TransferFailed();
           }
+          
+       }
+
+       function mintDSCToken(uint dscToken) external {
+           s_mintedColletralAmount[msg.sender] += dscToken ;
+           revertifHealthFactorIsBroken();
+       }
+
+       /////////////////////////////////////////////////////////
+              // INTERNAL FUNCTION AND PRIVATE AND VIEW 
+       /////////////////////////////////////////////////////////
+       function revertifHealthFactorIsBroken() internal {
+          // if health factor is broken revert 
+       }
+
+       function _healthFactor() internal returns(bool) {
 
        }
+       function _getInformation() internal returns(uint){
+        
+       }
+
 }
